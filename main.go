@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"runtime"
@@ -10,7 +9,6 @@ import (
 	"github.com/tarm/serial"
 	"io/ioutil"
 	"strings"
-	"time"
 )
 
 var Melody = melody.New()
@@ -21,14 +19,6 @@ func init() {
 
 	// Use all CPU cores
 	runtime.GOMAXPROCS(runtime.NumCPU())
-
-	Melody.HandleMessage(func(s *melody.Session, msg []byte) {
-
-		Melody.BroadcastFilter(msg, func(q *melody.Session) bool {
-			log.Println(q.Request.URL.Path)
-			return q.Request.URL.Path == s.Request.URL.Path
-		})
-	})
 
 	Melody.Upgrader.CheckOrigin = func(r *http.Request) bool {
 		return true
@@ -54,31 +44,24 @@ func main() {
 	// Start the listener
 
 	c := &serial.Config{Name: findArduino(), Baud: 9600}
-	s, err := serial.OpenPort(c)
+	serial, err := serial.OpenPort(c)
 	if err != nil {
 		log.Fatal("No Arduino Found")
 	}
 
-	go loop(s)
+	Melody.HandleConnect(func(s *melody.Session) {
+		log.Println("Melody Connected")
+	})
 
-	RunServer(LoadHTTP(), LoadHTTPS())
-}
+	Melody.HandleMessage(func(s *melody.Session, msg []byte) {
 
-func loop(s *serial.Port) {
-	for {
-		buf := make([]byte, 128)
-		n, err := s.Read(buf)
+		log.Println(string(msg))
+		_, err := serial.Write([]byte(string(msg) + "\n"))
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%q", buf[:n])
-		fmt.Println("")
 
-		Melody.BroadcastFilter(buf[:n], func(q *melody.Session) bool {
-			return true
-		})
+	})
 
-		time.Sleep(50 * time.Millisecond)
-	}
-
+	RunServer(LoadHTTP(), LoadHTTPS())
 }

@@ -1,10 +1,12 @@
-# serialtowebsocket
+# websockettoserial
 
-receives serial and send websockets on port 8000/:something
+go build -ldflags=-s
 
-`./serialtowebsocket` to run
+receives webosocket on port 8000/:something and send serial
 
-`chmod 770 serialtowebsocket` if you get a permission error
+`./websockettoserial` to run
+
+`chmod 770 websockettoserial` if you get a permission error
 
 
 ### javascript client
@@ -17,3 +19,4 @@ ws.onmessage = function(e){
   var msg = JSON.parse(e.data)
   console.log(msg)
 }
+```
