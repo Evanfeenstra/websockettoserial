@@ -1,6 +1,8 @@
 # websockettoserial
 
+```
 go build -ldflags=-s
+```
 
 receives webosocket on port 8000/:something and send serial
 
@@ -14,9 +16,5 @@ receives webosocket on port 8000/:something and send serial
 ```
 var ws = new WebSocket('ws://localhost:8000/cool')
 
-// Received a message
-ws.onmessage = function(e){
-  var msg = JSON.parse(e.data)
-  console.log(msg)
-}
+ws.send(msg)
 ```
