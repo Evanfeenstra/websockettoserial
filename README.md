@@ -27,7 +27,6 @@ void setup() {
   pinMode(13, OUTPUT);
 }
 
-elapsedMillis timer;
 unsigned int integerValue=0;
 char incomingByte;
 
